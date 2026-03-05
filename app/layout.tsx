@@ -1,4 +1,4 @@
-import "./globals.css";
+﻿import "./globals.css";
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import type React from "react";
@@ -66,6 +66,7 @@ export default function RootLayout({
         <meta name="robots" content="index, follow" />
         <meta name="author" content="Aldo Tobing" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="google-site-verification" content="FOi8yHeDmxBlTyve7YP90ShIXTiHAxI3ZWyNjKtUhtw" />
         <link rel="icon" href="/favicon.ico" />
         <script
           type="application/ld+json"
