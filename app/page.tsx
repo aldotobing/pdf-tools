@@ -452,8 +452,8 @@ export default function HomePage() {
             </div>
           </motion.section>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_1fr]">
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_1fr] min-w-0 max-w-full">
+            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm min-w-0 max-w-full">
               <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">Queue</h2>
 
               <div className="mt-3 space-y-2">
@@ -469,19 +469,13 @@ export default function HomePage() {
                         transition={{ duration: 0.18 }}
                         className="rounded-xl border border-slate-200 bg-white px-3 py-3"
                       >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <FileText size={14} className="text-slate-500" />
-                              <p className="truncate text-sm font-medium text-slate-800">{entry.file.name}</p>
-                            </div>
-                            <p className="mt-1 text-xs text-slate-500">
-                              {formatBytes(entry.file.size)}
-                              {entry.pageCount !== null ? ` | ${entry.pageCount} pages` : " | scanning pages..."}
-                            </p>
+                        <div className="flex items-center gap-2">
+                          <div className="flex min-w-0 flex-1 items-center gap-2">
+                            <FileText size={14} className="text-slate-500 flex-shrink-0" />
+                            <p className="truncate text-sm font-medium text-slate-800">{entry.file.name}</p>
                           </div>
 
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 flex-shrink-0">
                             <IconButton onClick={() => moveFile(index, -1)} disabled={index === 0}>
                               <ArrowUp size={12} />
                             </IconButton>
@@ -494,21 +488,12 @@ export default function HomePage() {
                           </div>
                         </div>
 
-                        {isWorking && mode === "compress" && progressMap[entry.id] !== undefined ? (
-                          <div className="mt-2">
-                            <div className="mb-1 flex justify-between text-[11px] text-slate-500">
-                              <span>Compression</span>
-                              <span>{progressMap[entry.id]}%</span>
-                            </div>
-                            <div className="h-1.5 rounded-full bg-slate-200">
-                              <motion.div
-                                className="h-1.5 rounded-full bg-slate-900"
-                                initial={{ width: 0 }}
-                                animate={{ width: `${progressMap[entry.id]}%` }}
-                              />
-                            </div>
-                          </div>
-                        ) : null}
+                        <div className="mt-1 flex items-center gap-2">
+                          <p className="truncate text-xs text-slate-500">
+                            {formatBytes(entry.file.size)}
+                            {entry.pageCount !== null ? ` | ${entry.pageCount} pages` : " | scanning pages..."}
+                          </p>
+                        </div>
                       </motion.div>
                     ))
                   ) : (
@@ -524,7 +509,7 @@ export default function HomePage() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm min-w-0 max-w-full">
               {mode === "compress" && (
                   <motion.div
                     key="compress-pane"
@@ -676,31 +661,28 @@ export default function HomePage() {
                   </p>
 
                     {files.length > 0 ? (
-                      <div className="mt-4 space-y-2">
+                      <div className="mt-4 space-y-2 overflow-hidden">
                         {files.map((entry) => (
                           <div
                             key={entry.id}
-                            className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3"
+                            className="flex flex-col gap-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 overflow-hidden"
                           >
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2">
-                                <FileText size={14} className="text-slate-500" />
-                                <p className="truncate text-sm font-medium text-slate-800">{entry.file.name}</p>
-                              </div>
-                              <p className="mt-1 text-xs text-slate-500">
-                                {formatBytes(entry.file.size)}
-                                {entry.pageCount !== null ? ` | ${entry.pageCount} pages` : " | scanning pages..."}
-                              </p>
+                            <div className="flex items-center gap-2">
+                              <FileText size={14} className="text-slate-500 flex-shrink-0" />
+                              <p className="truncate text-sm font-medium text-slate-800">{entry.file.name}</p>
+                              <button
+                                type="button"
+                                onClick={() => setEditingFile(entry.file)}
+                                className="ml-auto inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 flex-shrink-0"
+                              >
+                                <LayoutGrid size={14} />
+                                Edit Pages
+                              </button>
                             </div>
-
-                            <button
-                              type="button"
-                              onClick={() => setEditingFile(entry.file)}
-                              className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
-                            >
-                              <LayoutGrid size={14} />
-                              Edit Pages
-                            </button>
+                            <p className="text-xs text-slate-500">
+                              {formatBytes(entry.file.size)}
+                              {entry.pageCount !== null ? ` | ${entry.pageCount} pages` : " | scanning pages..."}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -718,31 +700,28 @@ export default function HomePage() {
                   </p>
 
                   {files.length > 0 ? (
-                    <div className="mt-4 space-y-2">
+                    <div className="mt-4 space-y-2 overflow-hidden">
                       {files.map((entry) => (
                         <div
                           key={entry.id}
-                          className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3"
+                          className="flex flex-col gap-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 overflow-hidden"
                         >
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <FileText size={14} className="text-slate-500" />
-                              <p className="truncate text-sm font-medium text-slate-800">{entry.file.name}</p>
-                            </div>
-                            <p className="mt-1 text-xs text-slate-500">
-                              {formatBytes(entry.file.size)}
-                              {entry.pageCount !== null ? ` | ${entry.pageCount} pages` : " | scanning pages..."}
-                            </p>
+                          <div className="flex items-center gap-2">
+                            <FileText size={14} className="text-slate-500 flex-shrink-0" />
+                            <p className="truncate text-sm font-medium text-slate-800">{entry.file.name}</p>
+                            <button
+                              type="button"
+                              onClick={() => setSecurityFile(entry.file)}
+                              className="ml-auto inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 flex-shrink-0"
+                            >
+                              <Lock size={14} />
+                              Security Tools
+                            </button>
                           </div>
-
-                          <button
-                            type="button"
-                            onClick={() => setSecurityFile(entry.file)}
-                            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
-                          >
-                            <Lock size={14} />
-                            Security Tools
-                          </button>
+                          <p className="text-xs text-slate-500">
+                            {formatBytes(entry.file.size)}
+                            {entry.pageCount !== null ? ` | ${entry.pageCount} pages` : " | scanning pages..."}
+                          </p>
                         </div>
                       ))}
                     </div>

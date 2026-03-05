@@ -1,4 +1,5 @@
 import { PDFDocument, degrees, rgb, StandardFonts } from "pdf-lib";
+import { encryptPDF } from "@pdfsmaller/pdf-encrypt-lite";
 
 /**
  * Extract specific pages from a PDF into a new PDF.
@@ -196,21 +197,36 @@ export async function applyPdfPageOperations(
 }
 
 /**
- * Note: Password protection requires additional libraries (e.g., hummus-pdf or qpdf).
- * This is a placeholder for future implementation.
+ * Add password protection to a PDF using RC4 128-bit encryption.
+ * @param file - The source PDF file
+ * @param password - The password to set (min 4 characters)
+ * @returns A Blob representing the password-protected PDF
  */
 export async function protectPdfWithPassword(
   file: File,
   password: string
 ): Promise<Blob> {
-  throw new Error("Password protection requires server-side processing. This feature is coming soon.");
+  if (!password || password.length < 4) {
+    throw new Error("Password must be at least 4 characters");
+  }
+
+  const arrayBuffer = await file.arrayBuffer();
+  
+  // Use pdf-encrypt-lite to add password protection
+  const encryptedPdf = await encryptPDF(new Uint8Array(arrayBuffer), password, password);
+
+  return new Blob([encryptedPdf], { type: "application/pdf" });
 }
 
+/**
+ * Note: Removing passwords requires the original unencrypted PDF.
+ * This is a placeholder for future implementation.
+ */
 export async function removePdfPassword(
   file: File,
   password: string
 ): Promise<Blob> {
-  throw new Error("Password removal requires server-side processing. This feature is coming soon.");
+  throw new Error("Password removal requires the original unencrypted PDF. This feature is coming soon.");
 }
 
 export interface WatermarkOptions {

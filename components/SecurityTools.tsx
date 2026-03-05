@@ -4,7 +4,9 @@ import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Lock,
+  Unlock,
   FileText,
+  Download,
   Eye,
   EyeOff,
   Shield,
@@ -13,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import {
+  protectPdfWithPassword,
   addWatermarkToPdf,
   type WatermarkOptions,
 } from "@/utils/pdfPageEditor";
@@ -174,20 +177,117 @@ function PasswordProtection({
   onStatus: (msg: string) => void;
   onProcessing: (loading: boolean) => void;
 }) {
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleAddPassword = useCallback(async () => {
+    if (!password) {
+      onStatus("Please enter a password");
+      return;
+    }
+    if (password !== confirmPassword) {
+      onStatus("Passwords do not match");
+      return;
+    }
+    if (password.length < 4) {
+      onStatus("Password must be at least 4 characters");
+      return;
+    }
+
+    onProcessing(true);
+    try {
+      const blob = await protectPdfWithPassword(file, password);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `protected_${file.name}`;
+      a.click();
+      URL.revokeObjectURL(url);
+      onStatus("✓ PDF password protected and downloaded successfully");
+      setPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      onStatus(`✗ ${error.message || "Failed to add password protection"}`);
+    } finally {
+      onProcessing(false);
+    }
+  }, [file, password, confirmPassword, onProcessing, onStatus]);
+
   return (
     <div className="space-y-6">
       <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
-        <div className="text-center py-12">
-          <Lock size={48} className="mx-auto text-slate-500 mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">Password Protection</h3>
-          <p className="text-slate-400 mb-6 max-w-md mx-auto">
-            Add or remove passwords from PDFs. This feature requires additional processing and is coming soon.
-          </p>
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-full text-amber-400 text-sm">
-            <AlertTriangle size={16} />
-            Coming Soon
+        {/* Security Notice */}
+        <div className="flex items-start gap-3 p-4 mb-6 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+          <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={20} />
+          <div className="text-sm text-amber-200">
+            <p className="font-medium mb-1">Important Security Notes:</p>
+            <ul className="list-disc list-inside space-y-1 text-amber-300/80">
+              <li>Store your password safely - it cannot be recovered if lost</li>
+              <li>This password will be required to open the PDF</li>
+              <li>Uses RC4 128-bit encryption (runs entirely in your browser)</li>
+              <li>Compatible with Adobe Reader, Preview, and most PDF viewers</li>
+            </ul>
           </div>
         </div>
+
+        {/* Form Fields */}
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                placeholder="Enter password (min 4 characters)"
+              />
+              <button
+                onClick={() => setShowPassword(!showPassword)}
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Confirm Password
+            </label>
+            <input
+              type={showPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={`w-full px-4 py-2.5 bg-slate-700 border rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition ${
+                confirmPassword && password !== confirmPassword
+                  ? "border-red-500"
+                  : "border-slate-600"
+              }`}
+              placeholder="Confirm password"
+            />
+            {confirmPassword && password !== confirmPassword && (
+              <p className="mt-1.5 text-sm text-red-400 flex items-center gap-1.5">
+                <AlertTriangle size={14} />
+                Passwords do not match
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          onClick={handleAddPassword}
+          disabled={!password || password !== confirmPassword || password.length < 4}
+          className="w-full mt-10 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:cursor-not-allowed text-white rounded-lg font-medium transition"
+        >
+          <Lock size={18} />
+          Add Password & Download
+        </button>
       </div>
     </div>
   );
@@ -242,88 +342,91 @@ function WatermarkTool({
 
   return (
     <div className="space-y-6">
-      <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">
-            Watermark Text
-          </label>
-          <input
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            placeholder="e.g., CONFIDENTIAL, DRAFT, SAMPLE"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
+      <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+        {/* Form Fields */}
+        <div className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">
-              Font Size: {fontSize}px
+              Watermark Text
             </label>
             <input
-              type="range"
-              min="12"
-              max="120"
-              value={fontSize}
-              onChange={(e) => setFontSize(Number(e.target.value))}
-              className="w-full"
+              type="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              className="w-full px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+              placeholder="e.g., CONFIDENTIAL, DRAFT, SAMPLE"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Opacity: {opacity}%
-            </label>
-            <input
-              type="range"
-              min="5"
-              max="100"
-              value={opacity}
-              onChange={(e) => setOpacity(Number(e.target.value))}
-              className="w-full"
-            />
-          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Font Size: <span className="text-emerald-400">{fontSize}px</span>
+              </label>
+              <input
+                type="range"
+                min="12"
+                max="120"
+                value={fontSize}
+                onChange={(e) => setFontSize(Number(e.target.value))}
+                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Rotation: {rotation}°
-            </label>
-            <input
-              type="range"
-              min="-180"
-              max="180"
-              value={rotation}
-              onChange={(e) => setRotation(Number(e.target.value))}
-              className="w-full"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Opacity: <span className="text-emerald-400">{opacity}%</span>
+              </label>
+              <input
+                type="range"
+                min="5"
+                max="100"
+                value={opacity}
+                onChange={(e) => setOpacity(Number(e.target.value))}
+                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Color
-            </label>
-            <div className="flex gap-2">
-              <ColorButton
-                color="rgb(128, 128, 128)"
-                selected={color.r === 0.5}
-                onClick={() => setColor({ r: 0.5, g: 0.5, b: 0.5 })}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Rotation: <span className="text-emerald-400">{rotation}°</span>
+              </label>
+              <input
+                type="range"
+                min="-180"
+                max="180"
+                value={rotation}
+                onChange={(e) => setRotation(Number(e.target.value))}
+                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
               />
-              <ColorButton
-                color="rgb(255, 0, 0)"
-                selected={color.r === 1 && color.g === 0}
-                onClick={() => setColor({ r: 1, g: 0, b: 0 })}
-              />
-              <ColorButton
-                color="rgb(0, 0, 255)"
-                selected={color.b === 1 && color.r === 0}
-                onClick={() => setColor({ r: 0, g: 0, b: 1 })}
-              />
-              <ColorButton
-                color="rgb(0, 0, 0)"
-                selected={color.r === 0 && color.g === 0}
-                onClick={() => setColor({ r: 0, g: 0, b: 0 })}
-              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Color
+              </label>
+              <div className="flex gap-2">
+                <ColorButton
+                  color="rgb(128, 128, 128)"
+                  selected={color.r === 0.5}
+                  onClick={() => setColor({ r: 0.5, g: 0.5, b: 0.5 })}
+                />
+                <ColorButton
+                  color="rgb(255, 0, 0)"
+                  selected={color.r === 1 && color.g === 0}
+                  onClick={() => setColor({ r: 1, g: 0, b: 0 })}
+                />
+                <ColorButton
+                  color="rgb(0, 0, 255)"
+                  selected={color.b === 1 && color.r === 0}
+                  onClick={() => setColor({ r: 0, g: 0, b: 1 })}
+                />
+                <ColorButton
+                  color="rgb(0, 0, 0)"
+                  selected={color.r === 0 && color.g === 0}
+                  onClick={() => setColor({ r: 0, g: 0, b: 0 })}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -393,7 +496,7 @@ function WatermarkTool({
 
         <button
           onClick={handleAddWatermark}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium transition"
+          className="w-full mt-6 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-medium transition"
         >
           <FileText size={18} />
           Add Watermark & Download
