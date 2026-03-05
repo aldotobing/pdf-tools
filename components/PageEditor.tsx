@@ -654,6 +654,7 @@ function PageThumbnail({ page, index, isSelected, onSelect, viewMode }: PageThum
             src={page.thumbnailUrl}
             alt={`Page ${index + 1}`}
             className="w-full h-full object-cover"
+            style={{ imageRendering: 'auto' }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-slate-700">
@@ -696,14 +697,15 @@ async function generateThumbnail(file: File, pageIndex: number): Promise<string>
     if (!(window as any).pdfjsLib) {
       await loadPDFJSFromCDN();
     }
-    
+
     const pdfjsLib = (window as any).pdfjsLib;
     const arrayBuffer = await file.arrayBuffer();
     const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
     const pdfDoc = await loadingTask.promise;
     const pdfPage = await pdfDoc.getPage(pageIndex + 1);
 
-    const viewport = pdfPage.getViewport({ scale: 0.3 });
+    // Use higher scale for better quality thumbnails
+    const viewport = pdfPage.getViewport({ scale: 0.5 });
     const canvas = document.createElement("canvas");
     canvas.height = viewport.height;
     canvas.width = viewport.width;
@@ -715,7 +717,7 @@ async function generateThumbnail(file: File, pageIndex: number): Promise<string>
     
     await pdfPage.render(renderContext).promise;
     
-    return canvas.toDataURL("image/jpeg", 0.8);
+    return canvas.toDataURL("image/jpeg", 0.85);
   } catch (error) {
     console.error(`Failed to generate thumbnail for page ${pageIndex}:`, error);
     return "";
