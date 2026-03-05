@@ -387,6 +387,11 @@ export default function PageEditor({ file, onClose }: PageEditorProps) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-slate-900/95 z-50 overflow-hidden"
+      style={{ 
+        textRendering: 'geometricPrecision',
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+      }}
     >
       <div className="h-full flex flex-col" ref={containerRef}>
         {/* Header */}
@@ -654,7 +659,9 @@ function PageThumbnail({ page, index, isSelected, onSelect, viewMode }: PageThum
             src={page.thumbnailUrl}
             alt={`Page ${index + 1}`}
             className="w-full h-full object-cover"
-            style={{ imageRendering: 'auto' }}
+            style={{ 
+              imageRendering: 'auto',
+            }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-slate-700">
@@ -704,8 +711,8 @@ async function generateThumbnail(file: File, pageIndex: number): Promise<string>
     const pdfDoc = await loadingTask.promise;
     const pdfPage = await pdfDoc.getPage(pageIndex + 1);
 
-    // Use higher scale for better quality thumbnails
-    const viewport = pdfPage.getViewport({ scale: 0.5 });
+    // Use higher scale for better quality thumbnails (1.0 = full resolution)
+    const viewport = pdfPage.getViewport({ scale: 1.0 });
     const canvas = document.createElement("canvas");
     canvas.height = viewport.height;
     canvas.width = viewport.width;
@@ -717,7 +724,8 @@ async function generateThumbnail(file: File, pageIndex: number): Promise<string>
     
     await pdfPage.render(renderContext).promise;
     
-    return canvas.toDataURL("image/jpeg", 0.85);
+    // Higher quality JPEG
+    return canvas.toDataURL("image/jpeg", 0.9);
   } catch (error) {
     console.error(`Failed to generate thumbnail for page ${pageIndex}:`, error);
     return "";
