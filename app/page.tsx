@@ -461,38 +461,40 @@ export default function HomePage() {
           >
             <div className="flex flex-col gap-3">
               {/* Mode Buttons - Scrollable on mobile */}
-              <div className="overflow-x-auto -mx-3 px-3 pb-1">
-                <div className="inline-flex rounded-xl bg-slate-100 p-1 gap-1 whitespace-nowrap">
-                  <ModeButton
-                    active={mode === "compress"}
-                    icon={<FileArchive size={14} />}
-                    label="Compress"
-                    onClick={() => setMode("compress")}
-                  />
-                  <ModeButton
-                    active={mode === "merge"}
-                    icon={<Merge size={14} />}
-                    label="Merge"
-                    onClick={() => setMode("merge")}
-                  />
-                  <ModeButton
-                    active={mode === "edit"}
-                    icon={<LayoutGrid size={14} />}
-                    label="Edit Pages"
-                    onClick={() => setMode("edit")}
-                  />
-                  <ModeButton
-                    active={mode === "security"}
-                    icon={<Lock size={14} />}
-                    label="Security"
-                    onClick={() => setMode("security")}
-                  />
-                  <ModeButton
-                    active={mode === "convert"}
-                    icon={<Repeat size={14} />}
-                    label="Convert"
-                    onClick={() => setMode("convert")}
-                  />
+              <div className="overflow-hidden rounded-xl bg-slate-100">
+                <div className="w-full overflow-x-auto scrollbar-hide">
+                  <div className="inline-flex items-center p-1.5 sm:p-2 gap-1 whitespace-nowrap">
+                    <ModeButton
+                      active={mode === "compress"}
+                      icon={<FileArchive size={14} />}
+                      label="Compress"
+                      onClick={() => setMode("compress")}
+                    />
+                    <ModeButton
+                      active={mode === "merge"}
+                      icon={<Merge size={14} />}
+                      label="Merge"
+                      onClick={() => setMode("merge")}
+                    />
+                    <ModeButton
+                      active={mode === "edit"}
+                      icon={<LayoutGrid size={14} />}
+                      label="Edit Pages"
+                      onClick={() => setMode("edit")}
+                    />
+                    <ModeButton
+                      active={mode === "security"}
+                      icon={<Lock size={14} />}
+                      label="Security"
+                      onClick={() => setMode("security")}
+                    />
+                    <ModeButton
+                      active={mode === "convert"}
+                      icon={<Repeat size={14} />}
+                      label="Convert"
+                      onClick={() => setMode("convert")}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1080,7 +1082,7 @@ function ModeButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+      className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-md px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
         active
           ? "bg-white text-slate-900 shadow-sm"
           : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
