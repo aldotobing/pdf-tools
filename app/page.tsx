@@ -71,26 +71,26 @@ const MAX_FILES = 20;
 const PRESET_META: Record<CompressionLevel, CompressionPresetMeta & { borderClass: string }> = {
   low: {
     label: "Archive",
-    targetReduction: 25,
+    targetReduction: 10,
     colorClass: "bg-emerald-500",
     borderClass: "border-emerald-500",
-    tooltip: "Best for signed contracts, presentations, and documents where visual fidelity matters most.",
+    tooltip: "Best quality: Full resolution with light compression for important documents.",
     icon: "📦",
   },
   medium: {
     label: "Balanced",
-    targetReduction: 45,
+    targetReduction: 30,
     colorClass: "bg-sky-500",
     borderClass: "border-sky-500",
-    tooltip: "Recommended for day-to-day sharing. Good size reduction without obvious quality loss.",
+    tooltip: "Recommended: Good balance between file size and quality for everyday use.",
     icon: "⚖️",
   },
   high: {
     label: "Web",
-    targetReduction: 70,
+    targetReduction: 55,
     colorClass: "bg-rose-500",
     borderClass: "border-rose-500",
-    tooltip: "Use when upload speed and file size are priority, such as forms, drafts, or quick review files.",
+    tooltip: "Smaller file size, ideal for email and web sharing.",
     icon: "🚀",
   },
 };
