@@ -522,12 +522,12 @@ export default function HomePage() {
             <div
               {...getRootProps()}
               role="button"
-              aria-label="File upload dropzone"
+              aria-label="Drag and drop PDF files to compress or merge"
               className={`mt-4 rounded-xl border border-dashed p-5 transition ${
                 isDragActive ? "border-slate-500 bg-slate-100" : "border-slate-300 bg-slate-50"
               }`}
             >
-              <input {...getInputProps()} />
+              <input {...getInputProps({ id: 'pdf-upload-input' })} />
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
                   <div className="rounded-lg bg-slate-900 p-2 text-white">
@@ -711,8 +711,9 @@ export default function HomePage() {
                             <div className="px-4 py-3 space-y-3 bg-white">
                               {/* Target File Size */}
                               <div className="border-b border-slate-200 pb-3">
-                                <label className="flex items-center gap-3 cursor-pointer mb-3">
+                                <label htmlFor="use-target-size" className="flex items-center gap-3 cursor-pointer mb-3">
                                   <input
+                                    id="use-target-size"
                                     type="checkbox"
                                     checked={useTargetSize}
                                     onChange={(e) => setUseTargetSize(e.target.checked)}
@@ -728,7 +729,9 @@ export default function HomePage() {
                                 
                                 {useTargetSize && (
                                   <div className="flex items-center gap-2 ml-7">
+                                    <label htmlFor="target-size-mb" className="sr-only">Target size in MB</label>
                                     <input
+                                      id="target-size-mb"
                                       type="number"
                                       value={targetSizeMB}
                                       onChange={(e) => setTargetSizeMB(e.target.value)}
@@ -742,8 +745,9 @@ export default function HomePage() {
                                 )}
                               </div>
 
-                              <label className="flex items-start gap-3 cursor-pointer">
+                              <label htmlFor="optimize-grayscale" className="flex items-start gap-3 cursor-pointer">
                                 <input
+                                  id="optimize-grayscale"
                                   type="checkbox"
                                   checked={optimizeGrayscale}
                                   onChange={(e) => setOptimizeGrayscale(e.target.checked)}
@@ -757,8 +761,9 @@ export default function HomePage() {
                                 </div>
                               </label>
 
-                              <label className="flex items-start gap-3 cursor-pointer">
+                              <label htmlFor="optimize-flatten" className="flex items-start gap-3 cursor-pointer">
                                 <input
+                                  id="optimize-flatten"
                                   type="checkbox"
                                   checked={optimizeFlatten}
                                   onChange={(e) => setOptimizeFlatten(e.target.checked)}

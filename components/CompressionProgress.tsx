@@ -21,7 +21,14 @@ export default function CompressionProgress({ files, progress }: CompressionProg
             <span className="text-sm font-medium text-gray-600">{file.name}</span>
             <span className="text-sm font-medium text-gray-600">{progress[index]}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+          <div 
+            className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden"
+            role="progressbar"
+            aria-valuenow={progress[index]}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Compression progress for ${file.name}`}
+          >
             <motion.div
               className="bg-blue-600 h-2.5 rounded-full"
               initial={{ width: 0 }}

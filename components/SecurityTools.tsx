@@ -252,11 +252,12 @@ function PasswordProtection({
         {/* Form Fields */}
         <div className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label htmlFor="pdf-password" className="block text-sm font-medium text-slate-300 mb-2">
               Password
             </label>
             <div className="relative">
               <input
+                id="pdf-password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -274,10 +275,11 @@ function PasswordProtection({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label htmlFor="confirm-password" className="block text-sm font-medium text-slate-300 mb-2">
               Confirm Password
             </label>
             <input
+              id="confirm-password"
               type={showPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -457,10 +459,11 @@ function WatermarkTool({
 
           {useText && (
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="watermark-text" className="block text-sm font-medium text-slate-300 mb-2">
                 Watermark Text
               </label>
               <input
+                id="watermark-text"
                 type="text"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -472,19 +475,20 @@ function WatermarkTool({
 
           {useImage && (
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="watermark-image-upload" className="block text-sm font-medium text-slate-300 mb-2">
                 Watermark Image
               </label>
               {!imagePreview ? (
                 <div
                   {...getRootProps()}
+                  aria-label="Drag and drop image here for watermark"
                   className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition ${
                     isDragActive
                       ? "border-emerald-500 bg-emerald-500/10"
                       : "border-slate-600 hover:border-slate-500 hover:bg-slate-700/50"
                   }`}
                 >
-                  <input {...getInputProps()} />
+                  <input {...getInputProps({ id: 'watermark-image-upload' })} />
                   <Upload className="mx-auto text-slate-400 mb-3" size={32} />
                   {isDragActive ? (
                     <p className="text-emerald-400 font-medium">Drop image here...</p>
@@ -530,10 +534,11 @@ function WatermarkTool({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="watermark-font-size" className="block text-sm font-medium text-slate-300 mb-2">
                 Font Size: <span className="text-emerald-400">{fontSize}px</span>
               </label>
               <input
+                id="watermark-font-size"
                 type="range"
                 min="12"
                 max="120"
@@ -544,10 +549,11 @@ function WatermarkTool({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="watermark-opacity" className="block text-sm font-medium text-slate-300 mb-2">
                 Opacity: <span className="text-emerald-400">{opacity}%</span>
               </label>
               <input
+                id="watermark-opacity"
                 type="range"
                 min="5"
                 max="100"
@@ -558,10 +564,11 @@ function WatermarkTool({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="watermark-rotation" className="block text-sm font-medium text-slate-300 mb-2">
                 Rotation: <span className="text-emerald-400">{rotation}°</span>
               </label>
               <input
+                id="watermark-rotation"
                 type="range"
                 min="-180"
                 max="180"

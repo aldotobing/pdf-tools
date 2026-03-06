@@ -140,6 +140,7 @@ export default function CompressionOptions({
           }}
           max={100}
           step={1}
+          aria-label="Compression percentage"
           className="relative w-full h-2 rounded-full cursor-pointer mb-6"
         />
 

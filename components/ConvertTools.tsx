@@ -265,10 +265,11 @@ function PdfToImages({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label htmlFor="convert-quality" className="block text-sm font-medium text-slate-300 mb-2">
               Quality: {quality}%
             </label>
             <input
+              id="convert-quality"
               type="range"
               min="50"
               max="100"
@@ -280,10 +281,11 @@ function PdfToImages({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label htmlFor="convert-resolution" className="block text-sm font-medium text-slate-300 mb-2">
               Resolution: {scale * 72} DPI
             </label>
             <input
+              id="convert-resolution"
               type="range"
               min="1"
               max="4"
@@ -436,13 +438,14 @@ function ImagesToPdf({
           {/* Dropzone with Previews */}
           <div
             {...getRootProps()}
+            aria-label="Drag and drop images here to convert to PDF"
             className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all duration-300 ${
               isDragActive
                 ? "border-emerald-500 bg-emerald-500/10 scale-[1.02]"
                 : "border-slate-600 hover:border-slate-500 hover:bg-slate-700/50"
             }`}
           >
-            <input {...getInputProps()} />
+            <input {...getInputProps({ id: 'images-to-pdf-upload' })} />
             
             {images.length === 0 ? (
               <motion.div

@@ -86,14 +86,20 @@ export default function OCRTool({ file, onStatus, onProcessing }: OCRToolProps) 
 
         {/* Language Selection */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-slate-300 mb-3">
+          <label id="ocr-language-label" className="block text-sm font-medium text-slate-300 mb-3">
             Document Language
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div 
+            className="grid grid-cols-2 gap-3" 
+            role="radiogroup" 
+            aria-labelledby="ocr-language-label"
+          >
             {languages.map((lang) => (
               <button
                 key={lang.value}
                 type="button"
+                role="radio"
+                aria-checked={language === lang.value}
                 onClick={() => setLanguage(lang.value as 'eng' | 'spa' | 'fra' | 'deu')}
                 className={`p-3 rounded-lg border text-left transition ${
                   language === lang.value

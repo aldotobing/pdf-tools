@@ -43,13 +43,14 @@ export default function FileUploader({
         {...(getRootProps() as any)}
         animate={{ scale: isDragActive ? 1.02 : 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 10 }}
+        aria-label="Upload PDF files"
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition duration-300 ease-in-out ${
           isDragActive
             ? "border-blue-400 bg-blue-50"
             : "border-gray-300 hover:border-blue-400"
         }`}
       >
-        <input {...getInputProps()} />
+        <input {...getInputProps({ id: 'pdf-file-uploader' })} />
         <div>
           <motion.div
             animate={{ y: isDragActive ? -10 : 0 }}
