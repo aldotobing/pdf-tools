@@ -1,4 +1,4 @@
-import { PDFDocument, degrees, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument, degrees, rgb, StandardFonts, PDFImage } from "pdf-lib";
 import { encryptPDF } from "@pdfsmaller/pdf-encrypt-lite";
 
 /**
@@ -241,7 +241,7 @@ export interface WatermarkOptions {
 }
 
 /**
- * Add a text watermark to a PDF.
+ * Add a text or image watermark to a PDF.
  * @param file - The source PDF file
  * @param options - Watermark configuration options
  * @returns A Blob representing the watermarked PDF
@@ -253,9 +253,10 @@ export async function addWatermarkToPdf(
   const arrayBuffer = await file.arrayBuffer();
   const pdfDoc = await PDFDocument.load(arrayBuffer);
   const pages = pdfDoc.getPages();
-  
+
   const {
-    text = 'CONFIDENTIAL',
+    text,
+    image,
     fontSize = 48,
     color = { r: 0.5, g: 0.5, b: 0.5 },
     opacity = 0.3,
@@ -264,64 +265,113 @@ export async function addWatermarkToPdf(
     scale = 1,
   } = options;
 
+  // Embed image if provided
+  let embeddedImage: PDFImage | undefined;
+  if (image) {
+    const imageBytes = await image.arrayBuffer();
+    const mimeType = image.type.toLowerCase();
+    
+    if (mimeType.includes('png')) {
+      embeddedImage = await pdfDoc.embedPng(new Uint8Array(imageBytes));
+    } else if (mimeType.includes('jpeg') || mimeType.includes('jpg')) {
+      embeddedImage = await pdfDoc.embedJpg(new Uint8Array(imageBytes));
+    } else {
+      throw new Error(`Unsupported image format: ${image.type}. Use PNG or JPEG.`);
+    }
+  }
+
   pages.forEach((page) => {
     const { width, height } = page.getSize();
     const rgbColor = rgb(color.r, color.g, color.b);
-    
+
     if (position === 'tile') {
       // Tile watermark across the page
       const stepX = width / 3;
       const stepY = height / 3;
-      
+
       for (let x = stepX / 2; x < width; x += stepX) {
         for (let y = stepY / 2; y < height; y += stepY) {
-          page.drawText(text, {
-            x,
-            y,
-            size: fontSize * scale,
-            color: rgbColor,
-            opacity,
-            rotate: degrees(rotation),
-          });
+          if (text) {
+            page.drawText(text, {
+              x,
+              y,
+              size: fontSize * scale,
+              color: rgbColor,
+              opacity,
+              rotate: degrees(rotation),
+            });
+          }
+          if (embeddedImage) {
+            const imgWidth = embeddedImage.width * scale * 0.5;
+            const imgHeight = embeddedImage.height * scale * 0.5;
+            page.drawImage(embeddedImage, {
+              x: x - imgWidth / 2,
+              y: y - imgHeight / 2,
+              width: imgWidth,
+              height: imgHeight,
+              opacity,
+            });
+          }
         }
       }
     } else {
       // Single watermark at position
       let x = width / 2;
       let y = height / 2;
-      
+      let textWidth = 0;
+      let textHeight = 0;
+
+      if (text) {
+        textWidth = text.length * fontSize * scale * 0.4;
+        textHeight = fontSize * scale;
+      }
+
       switch (position) {
         case 'top-left':
           x = 50;
-          y = height - 50;
+          y = height - 50 - textHeight;
           break;
         case 'top-right':
-          x = width - 200;
-          y = height - 50;
+          x = width - 200 - textWidth;
+          y = height - 50 - textHeight;
           break;
         case 'bottom-left':
           x = 50;
           y = 50;
           break;
         case 'bottom-right':
-          x = width - 200;
+          x = width - 200 - textWidth;
           y = 50;
           break;
         case 'center':
         default:
-          x = width / 2 - (text.length * fontSize * scale) / 4;
-          y = height / 2;
+          x = width / 2 - textWidth / 2;
+          y = height / 2 - textHeight / 2;
           break;
       }
-      
-      page.drawText(text, {
-        x,
-        y,
-        size: fontSize * scale,
-        color: rgbColor,
-        opacity,
-        rotate: degrees(rotation),
-      });
+
+      if (text) {
+        page.drawText(text, {
+          x,
+          y,
+          size: fontSize * scale,
+          color: rgbColor,
+          opacity,
+          rotate: degrees(rotation),
+        });
+      }
+
+      if (embeddedImage) {
+        const imgWidth = embeddedImage.width * scale;
+        const imgHeight = embeddedImage.height * scale;
+        page.drawImage(embeddedImage, {
+          x: width / 2 - imgWidth / 2,
+          y: height / 2 - imgHeight / 2,
+          width: imgWidth,
+          height: imgHeight,
+          opacity,
+        });
+      }
     }
   });
 

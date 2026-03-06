@@ -7,6 +7,7 @@ import {
   Unlock,
   FileText,
   Download,
+  Upload,
   Eye,
   EyeOff,
   Shield,
@@ -14,6 +15,7 @@ import {
   Check,
   X,
 } from "lucide-react";
+import { useDropzone } from "react-dropzone";
 import {
   protectPdfWithPassword,
   addWatermarkToPdf,
@@ -298,19 +300,60 @@ function WatermarkTool({
   onStatus,
   onProcessing,
 }: {
-  file: File;
+  file: File | null;
   onStatus: (msg: string) => void;
   onProcessing: (loading: boolean) => void;
 }) {
   const [text, setText] = useState("CONFIDENTIAL");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState(48);
   const [opacity, setOpacity] = useState(30);
   const [rotation, setRotation] = useState(45);
   const [position, setPosition] = useState<WatermarkOptions["position"]>("center");
   const [color, setColor] = useState({ r: 0.5, g: 0.5, b: 0.5 });
+  const [useText, setUseText] = useState(true);
+  const [useImage, setUseImage] = useState(false);
+
+  const handleImageDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (file) {
+      setImageFile(file);
+      const preview = URL.createObjectURL(file);
+      setImagePreview(preview);
+      setUseImage(true);
+      setUseText(false);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: handleImageDrop,
+    accept: {
+      'image/png': ['.png'],
+      'image/jpeg': ['.jpg', '.jpeg'],
+    },
+    multiple: false,
+  });
+
+  const removeImage = useCallback(() => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setImageFile(null);
+    setImagePreview(null);
+    setUseImage(false);
+  }, [imagePreview]);
 
   const handleAddWatermark = useCallback(async () => {
-    if (!text.trim()) {
+    if (!file) {
+      onStatus("Please select a PDF file first");
+      return;
+    }
+    if (!useText && !useImage) {
+      onStatus("Please enable text or upload an image for watermark");
+      return;
+    }
+    if (useText && !text.trim()) {
       onStatus("Please enter watermark text");
       return;
     }
@@ -318,7 +361,8 @@ function WatermarkTool({
     onProcessing(true);
     try {
       const blob = await addWatermarkToPdf(file, {
-        text,
+        text: useText ? text : undefined,
+        image: useImage ? imageFile || undefined : undefined,
         fontSize,
         opacity: opacity / 100,
         rotation,
@@ -332,31 +376,141 @@ function WatermarkTool({
       a.download = `watermarked_${file.name}`;
       a.click();
       URL.revokeObjectURL(url);
-      onStatus("Watermark added and downloaded successfully");
+      onStatus("✓ Watermark added and downloaded successfully");
     } catch (error) {
       onStatus("Failed to add watermark");
     } finally {
       onProcessing(false);
     }
-  }, [file, text, fontSize, opacity, rotation, position, color, onProcessing, onStatus]);
+  }, [file, text, imageFile, useText, useImage, fontSize, opacity, rotation, position, color, onProcessing, onStatus]);
+
+  // Cleanup on unmount
+  useState(() => () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+  });
 
   return (
     <div className="space-y-6">
       <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
         {/* Form Fields */}
         <div className="space-y-5">
+          {/* Watermark Type Toggle */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Watermark Text
+            <label className="block text-sm font-medium text-slate-300 mb-3">
+              Watermark Type
             </label>
-            <input
-              type="text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              className="w-full px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
-              placeholder="e.g., CONFIDENTIAL, DRAFT, SAMPLE"
-            />
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => { setUseText(true); setUseImage(false); }}
+                className={`p-4 rounded-lg border text-left transition ${
+                  useText
+                    ? "bg-emerald-500/10 border-emerald-500"
+                    : "bg-slate-700/50 border-slate-600 hover:bg-slate-700"
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`w-4 h-4 rounded-full ${useText ? 'bg-emerald-500' : 'bg-slate-500'}`} />
+                  <span className={`font-semibold ${useText ? 'text-emerald-400' : 'text-slate-300'}`}>
+                    Text Watermark
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400">Add custom text watermark</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setUseImage(true); setUseText(false); }}
+                className={`p-4 rounded-lg border text-left transition ${
+                  useImage
+                    ? "bg-emerald-500/10 border-emerald-500"
+                    : "bg-slate-700/50 border-slate-600 hover:bg-slate-700"
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`w-4 h-4 rounded-full ${useImage ? 'bg-emerald-500' : 'bg-slate-500'}`} />
+                  <span className={`font-semibold ${useImage ? 'text-emerald-400' : 'text-slate-300'}`}>
+                    Image Watermark
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400">Add logo or branding image</p>
+              </button>
+            </div>
           </div>
+
+          {useText && (
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Watermark Text
+              </label>
+              <input
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                className="w-full px-4 py-2.5 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                placeholder="e.g., CONFIDENTIAL, DRAFT, SAMPLE"
+              />
+            </div>
+          )}
+
+          {useImage && (
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Watermark Image
+              </label>
+              {!imagePreview ? (
+                <div
+                  {...getRootProps()}
+                  className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition ${
+                    isDragActive
+                      ? "border-emerald-500 bg-emerald-500/10"
+                      : "border-slate-600 hover:border-slate-500 hover:bg-slate-700/50"
+                  }`}
+                >
+                  <input {...getInputProps()} />
+                  <Upload className="mx-auto text-slate-400 mb-3" size={32} />
+                  {isDragActive ? (
+                    <p className="text-emerald-400 font-medium">Drop image here...</p>
+                  ) : (
+                    <>
+                      <p className="text-slate-300 font-medium mb-1">
+                        Drag & drop image here
+                      </p>
+                      <p className="text-slate-500 text-sm">
+                        PNG or JPEG • Click to browse
+                      </p>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="relative rounded-xl overflow-hidden bg-slate-700/50 border border-slate-600 p-4">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={imagePreview}
+                      alt="Watermark preview"
+                      className="w-20 h-20 object-contain rounded-lg bg-slate-800"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-slate-200 truncate">
+                        {imageFile?.name}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {imageFile && (imageFile.size / 1024).toFixed(1)} KB
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
