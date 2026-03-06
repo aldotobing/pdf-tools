@@ -382,8 +382,8 @@ export default function HomePage() {
           >
             <div className="flex flex-col gap-3">
               {/* Mode Buttons - Scrollable on mobile */}
-              <div className="overflow-x-auto -mx-2 px-2 pb-2">
-                <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1 whitespace-nowrap">
+              <div className="overflow-x-auto -mx-3 px-3 pb-1">
+                <div className="inline-flex rounded-xl bg-slate-100 p-1 gap-1 whitespace-nowrap">
                   <ModeButton
                     active={mode === "compress"}
                     icon={<FileArchive size={14} />}
@@ -416,7 +416,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={removeDuplicates}
-                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 flex-1 sm:flex-none justify-center"
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 flex-1 sm:flex-none justify-center"
                 >
                   <WandSparkles size={14} />
                   <span className="hidden sm:inline">Deduplicate</span>
@@ -424,7 +424,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={resetSession}
-                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 flex-1 sm:flex-none justify-center"
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 flex-1 sm:flex-none justify-center"
                 >
                   <RefreshCw size={14} />
                   <span className="hidden sm:inline">Reset</span>
@@ -845,10 +845,10 @@ function ModeButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-lg px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+      className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-lg px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
         active
-          ? "bg-slate-900 text-white shadow-sm"
-          : "bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200"
+          ? "bg-white text-slate-900 shadow-sm"
+          : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
       }`}
     >
       {icon}
