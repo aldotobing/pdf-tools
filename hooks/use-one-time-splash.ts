@@ -9,7 +9,7 @@ type UseOneTimeSplashOptions = {
 
 export function useOneTimeSplash(options?: UseOneTimeSplashOptions) {
   const storageKey = options?.key ?? "pdf_workflow_splash_seen_v1";
-  const durationMs = options?.durationMs ?? 1700;
+  const durationMs = options?.durationMs ?? 2800; // Increased for professional feel
 
   const [hydrated, setHydrated] = useState(false);
   const [showSplash, setShowSplash] = useState(false);

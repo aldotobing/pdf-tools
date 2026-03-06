@@ -130,7 +130,7 @@ export default function HomePage() {
   const [optimizeFlatten, setOptimizeFlatten] = useState(false);
   const [useTargetSize, setUseTargetSize] = useState(false);
   const [targetSizeMB, setTargetSizeMB] = useState("");
-  const { showSplash, appReady } = useOneTimeSplash({ durationMs: 1800 });
+  const { showSplash, appReady } = useOneTimeSplash({ durationMs: 2800 });
 
   const clearCompressionResults = useCallback(() => {
     setCompressionResults((prev) => {
