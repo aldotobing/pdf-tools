@@ -60,28 +60,35 @@ type CompressionPresetMeta = {
   targetReduction: number;
   colorClass: string;
   tooltip: string;
+  icon: string;
 };
 
 const MAX_FILES = 20;
 
-const PRESET_META: Record<CompressionLevel, CompressionPresetMeta> = {
+const PRESET_META: Record<CompressionLevel, CompressionPresetMeta & { borderClass: string }> = {
   low: {
     label: "Archive",
     targetReduction: 25,
     colorClass: "bg-emerald-500",
+    borderClass: "border-emerald-500",
     tooltip: "Best for signed contracts, presentations, and documents where visual fidelity matters most.",
+    icon: "📦",
   },
   medium: {
     label: "Balanced",
     targetReduction: 45,
     colorClass: "bg-sky-500",
+    borderClass: "border-sky-500",
     tooltip: "Recommended for day-to-day sharing. Good size reduction without obvious quality loss.",
+    icon: "⚖️",
   },
   high: {
     label: "Web",
     targetReduction: 70,
     colorClass: "bg-rose-500",
+    borderClass: "border-rose-500",
     tooltip: "Use when upload speed and file size are priority, such as forms, drafts, or quick review files.",
+    icon: "🚀",
   },
 };
 
@@ -346,21 +353,21 @@ export default function HomePage() {
         transition={{ duration: 0.45, ease: "easeOut" }}
         className={`min-h-screen bg-slate-100 text-slate-900 ${appReady ? "pointer-events-auto" : "pointer-events-none"}`}
       >
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 lg:py-10">
           <motion.header
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+            className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:p-6 shadow-sm"
           >
-            <h1 className="font-[var(--font-display)] text-3xl font-semibold tracking-tight sm:text-4xl">
+            <h1 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
               Ship Smaller PDFs, Faster
             </h1>
-            <p className="mt-2 max-w-3xl text-sm text-slate-600 sm:text-base">
-              A private, all-in-one PDF workspace to optimize, organize, and prepare documents for any workflow. Everything stays on your device for privacy and control.
+            <p className="mt-2 text-sm sm:text-base text-slate-600">
+              A private, all-in-one PDF workspace to optimize, organize, and prepare documents for any workflow.
             </p>
 
-            <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
               <SummaryCard label="Files" value={String(files.length)} />
               <SummaryCard label="Total Size" value={formatBytes(totalSize)} />
               <SummaryCard label="Total Pages" value={String(totalPages)} />
@@ -371,52 +378,56 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.04 }}
-            className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+            className="mt-4 sm:mt-6 rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-5 shadow-sm"
           >
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1">
-                <ModeButton
-                  active={mode === "compress"}
-                  icon={<FileArchive size={14} />}
-                  label="Compress"
-                  onClick={() => setMode("compress")}
-                />
-                <ModeButton
-                  active={mode === "merge"}
-                  icon={<Merge size={14} />}
-                  label="Merge"
-                  onClick={() => setMode("merge")}
-                />
-                <ModeButton
-                  active={mode === "edit"}
-                  icon={<LayoutGrid size={14} />}
-                  label="Edit Pages"
-                  onClick={() => setMode("edit")}
-                />
-                <ModeButton
-                  active={mode === "security"}
-                  icon={<Lock size={14} />}
-                  label="Security"
-                  onClick={() => setMode("security")}
-                />
+            <div className="flex flex-col gap-3">
+              {/* Mode Buttons - Scrollable on mobile */}
+              <div className="overflow-x-auto -mx-2 px-2 pb-2">
+                <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1 whitespace-nowrap">
+                  <ModeButton
+                    active={mode === "compress"}
+                    icon={<FileArchive size={14} />}
+                    label="Compress"
+                    onClick={() => setMode("compress")}
+                  />
+                  <ModeButton
+                    active={mode === "merge"}
+                    icon={<Merge size={14} />}
+                    label="Merge"
+                    onClick={() => setMode("merge")}
+                  />
+                  <ModeButton
+                    active={mode === "edit"}
+                    icon={<LayoutGrid size={14} />}
+                    label="Edit Pages"
+                    onClick={() => setMode("edit")}
+                  />
+                  <ModeButton
+                    active={mode === "security"}
+                    icon={<Lock size={14} />}
+                    label="Security"
+                    onClick={() => setMode("security")}
+                  />
+                </div>
               </div>
 
+              {/* Action Buttons */}
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={removeDuplicates}
-                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 flex-1 sm:flex-none justify-center"
                 >
                   <WandSparkles size={14} />
-                  Deduplicate
+                  <span className="hidden sm:inline">Deduplicate</span>
                 </button>
                 <button
                   type="button"
                   onClick={resetSession}
-                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 flex-1 sm:flex-none justify-center"
                 >
                   <RefreshCw size={14} />
-                  Reset
+                  <span className="hidden sm:inline">Reset</span>
                 </button>
               </div>
             </div>
@@ -452,9 +463,9 @@ export default function HomePage() {
             </div>
           </motion.section>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_1fr] min-w-0 max-w-full">
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm min-w-0 max-w-full">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">Queue</h2>
+          <div className="mt-4 sm:mt-6 grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-4 sm:gap-6 min-w-0 max-w-full">
+            <section className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-5 shadow-sm min-w-0 max-w-full">
+              <h2 className="text-xs sm:text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">Queue</h2>
 
               <div className="mt-3 space-y-2">
                 <AnimatePresence mode="popLayout">
@@ -509,13 +520,13 @@ export default function HomePage() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm min-w-0 max-w-full">
+            <section className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-5 shadow-sm min-w-0 max-w-full">
               {mode === "compress" && (
                   <motion.div
                     key="compress-pane"
-                    initial={{ opacity: 0, x: 10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -523,10 +534,11 @@ export default function HomePage() {
                       <p className="text-xs text-slate-500">Suggested: {PRESET_META[recommendedLevel].label}</p>
                     </div>
 
-                    <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
                       {(Object.keys(PRESET_META) as CompressionLevel[]).map((level) => {
                         const preset = PRESET_META[level];
                         const active = compressionLevel === level;
+                        const isRecommended = level === recommendedLevel;
 
                         return (
                           <button
@@ -534,27 +546,40 @@ export default function HomePage() {
                             type="button"
                             onClick={() => setCompressionLevel(level)}
                             title={preset.tooltip}
-                            className={`group relative rounded-lg border px-3 py-3 text-left transition-all duration-200 ${
+                            className={`group relative rounded-xl p-3 text-left transition-all duration-200 border-2 ${
                               active
-                                ? "border-slate-900 bg-slate-900 text-white shadow-sm"
-                                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                                ? `${preset.colorClass.replace('bg-', 'bg-').replace('500', '50')} ${preset.borderClass} text-slate-900 shadow-sm`
+                                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                             }`}
                           >
+                            {/* Recommended Badge */}
+                            {isRecommended && !active && (
+                              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-semibold rounded-full whitespace-nowrap shadow-sm">
+                                Recommended
+                              </span>
+                            )}
+
                             <div className="pointer-events-none absolute left-1/2 top-0 z-20 hidden w-56 -translate-x-1/2 -translate-y-[108%] rounded-md border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-600 shadow-md group-hover:block group-focus-visible:block">
                               {preset.tooltip}
                             </div>
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-semibold">{preset.label}</p>
-                              <span className={`text-lg font-bold ${active ? "text-white" : "text-slate-800"}`}>
-                                {preset.targetReduction}%
-                              </span>
+                            
+                            <div className="flex items-center gap-1.5 mb-2.5">
+                              <span className="text-base">{preset.icon}</span>
+                              <p className="text-xs sm:text-sm font-semibold">{preset.label}</p>
                             </div>
-                            <div className="mt-3 h-1.5 rounded-full bg-slate-200/70">
+                            
+                            <div className="h-2 rounded-full bg-slate-100 mb-2">
                               <div
-                                className={`h-1.5 rounded-full ${active ? "bg-white" : preset.colorClass}`}
-                                style={{ width: `${preset.targetReduction}%` }}
+                                className={`h-full rounded-full transition-all duration-500 ease-out ${active ? preset.colorClass : 'bg-slate-300'}`}
+                                style={{ width: active ? `${preset.targetReduction}%` : '0%' }}
                               />
                             </div>
+                            
+                            {active && (
+                              <p className={`text-xs font-bold text-center ${preset.colorClass.replace('bg-', 'text-')}`}>
+                                ~{preset.targetReduction}% smaller
+                              </p>
+                            )}
                           </button>
                         );
                       })}
@@ -613,7 +638,13 @@ export default function HomePage() {
               )}
 
               {mode === "merge" && (
-                <div>
+                <motion.div
+                  key="merge-pane"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">Merge</h2>
                   <p className="mt-2 text-sm text-slate-600">Queue order determines output page order.</p>
 
@@ -650,11 +681,17 @@ export default function HomePage() {
                         </div>
                       </div>
                     ) : null}
-                </div>
+                </motion.div>
               )}
 
               {mode === "edit" && (
-                <div>
+                <motion.div
+                  key="edit-pane"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">Page Editor</h2>
                   <p className="mt-2 text-sm text-slate-600">
                     Select a PDF file to edit. Open a full-page editor to rotate, delete, reorder, and split pages.
@@ -689,11 +726,17 @@ export default function HomePage() {
                     ) : (
                       <p className="mt-4 text-sm text-slate-500">No files to edit. Upload PDF files first.</p>
                     )}
-                </div>
+                </motion.div>
               )}
 
               {mode === "security" && (
-                <div>
+                <motion.div
+                  key="security-pane"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">Security Tools</h2>
                   <p className="mt-2 text-sm text-slate-600">
                     Protect your PDFs with passwords, watermarks, or redact sensitive content.
@@ -728,7 +771,7 @@ export default function HomePage() {
                   ) : (
                     <p className="mt-4 text-sm text-slate-500">No files for security tools. Upload PDF files first.</p>
                   )}
-                </div>
+                </motion.div>
               )}
             </section>
           </div>
@@ -802,8 +845,10 @@ function ModeButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition ${
-        active ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"
+      className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-lg px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+        active
+          ? "bg-slate-900 text-white shadow-sm"
+          : "bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200"
       }`}
     >
       {icon}
