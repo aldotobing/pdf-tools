@@ -19,22 +19,47 @@ export function PWAInstallPrompt() {
   useEffect(() => {
     // Check if user previously dismissed the prompt
     const dismissed = localStorage.getItem('pwa-install-dismissed')
-    if (dismissed) {
+    const dismissedTime = localStorage.getItem('pwa-install-dismissed-time')
+    
+    // Check if 30 days have passed since dismissal
+    if (dismissed && dismissedTime) {
+      const daysPassed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24)
+      if (daysPassed > 30) {
+        localStorage.removeItem('pwa-install-dismissed')
+        localStorage.removeItem('pwa-install-dismissed-time')
+      } else {
+        console.log('PWA install prompt dismissed, skipping')
+        setIsDismissed(true)
+        return
+      }
+    } else if (dismissed) {
+      console.log('PWA install prompt dismissed without time, skipping')
       setIsDismissed(true)
       return
     }
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
+      console.log('✅ beforeinstallprompt event fired')
       setDeferredPrompt(e as BeforeInstallPromptEvent)
       // Show prompt after a short delay for better UX
-      setTimeout(() => setShowPrompt(true), 3000)
+      setTimeout(() => {
+        console.log('📱 Showing install prompt')
+        setShowPrompt(true)
+      }, 1500)
     }
 
     window.addEventListener(
       'beforeinstallprompt',
       handleBeforeInstallPrompt as EventListener
     )
+
+    // Log if the event is not supported
+    if (!('beforeinstallprompt' in window)) {
+      console.log('ℹ️ beforeinstallprompt event not supported (Firefox/Safari/incognito)')
+    } else {
+      console.log('ℹ️ beforeinstallprompt event is supported')
+    }
 
     return () => {
       window.removeEventListener(
@@ -48,14 +73,18 @@ export function PWAInstallPrompt() {
     if (!deferredPrompt) return
 
     setShowPrompt(false)
-    deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
+    try {
+      deferredPrompt.prompt()
+      const { outcome } = await deferredPrompt.userChoice
 
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt')
-      localStorage.setItem('pwa-install-dismissed', 'true')
-    } else {
-      console.log('User dismissed the install prompt')
+      if (outcome === 'accepted') {
+        console.log('✅ User accepted the install prompt')
+        localStorage.setItem('pwa-install-dismissed', 'true')
+      } else {
+        console.log('❌ User dismissed the install prompt')
+      }
+    } catch (err) {
+      console.error('Install prompt error:', err)
     }
 
     setDeferredPrompt(null)
@@ -70,21 +99,8 @@ export function PWAInstallPrompt() {
       'pwa-install-dismissed-time',
       Date.now().toString()
     )
+    console.log('👋 Install prompt dismissed for 30 days')
   }
-
-  // Check if 30 days have passed since dismissal
-  useEffect(() => {
-    const dismissedTime = localStorage.getItem('pwa-install-dismissed-time')
-    if (dismissedTime) {
-      const daysPassed =
-        (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24)
-      if (daysPassed > 30) {
-        localStorage.removeItem('pwa-install-dismissed')
-        localStorage.removeItem('pwa-install-dismissed-time')
-        setIsDismissed(false)
-      }
-    }
-  }, [])
 
   if (!showPrompt || isDismissed) return null
 
