@@ -463,7 +463,7 @@ export default function HomePage() {
               {/* Mode Buttons - Scrollable on mobile */}
               <div className="overflow-hidden rounded-xl bg-slate-100">
                 <div className="w-full overflow-x-auto scrollbar-hide">
-                  <div className="inline-flex items-center p-1.5 sm:p-2 gap-1 whitespace-nowrap">
+                  <div className="flex items-center min-w-max px-2 py-1.5 sm:p-2 gap-1 whitespace-nowrap justify-start sm:justify-center">
                     <ModeButton
                       active={mode === "compress"}
                       icon={<FileArchive size={14} />}
