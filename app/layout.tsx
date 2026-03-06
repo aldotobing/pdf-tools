@@ -1,7 +1,8 @@
 ﻿import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Sora } from "next/font/google";
 import type React from "react";
+import { PWAProvider } from "@/components/pwa-provider";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -12,6 +13,10 @@ const sora = Sora({
   subsets: ["latin"],
   variable: "--font-display",
 });
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://pdfzen.vercel.app"),
@@ -28,6 +33,12 @@ export const metadata: Metadata = {
     "local PDF tools",
   ],
   applicationName: "PDF Zen Studio",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "PDF Zen Studio",
+  },
   icons: {
     icon: [
       { url: "/assets/img/favicon-96x96.png", sizes: "96x96", type: "image/png" },
@@ -76,6 +87,7 @@ export default function RootLayout({
         <meta name="author" content="Aldo Tobing" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="google-site-verification" content="FOi8yHeDmxBlTyve7YP90ShIXTiHAxI3ZWyNjKtUhtw" />
+        <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/assets/img/favicon.ico" />
         <link rel="icon" href="/assets/img/favicon-96x96.png" sizes="96x96" type="image/png" />
         <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png" />
@@ -96,7 +108,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${plusJakartaSans.variable} ${sora.variable}`}>
-        {children}
+        <PWAProvider>{children}</PWAProvider>
       </body>
     </html>
   );
