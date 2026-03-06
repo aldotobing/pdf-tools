@@ -14,6 +14,7 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://pdfzen.vercel.app"),
   title: "Shrink, Merge, and Ship PDFs Faster | Private PDF Workspace",
   description:
     "A professional PDF workspace to compress and merge files with speed, clarity, and local-first privacy.",
@@ -27,6 +28,14 @@ export const metadata: Metadata = {
     "local PDF tools",
   ],
   applicationName: "PDF Zen Studio",
+  icons: {
+    icon: [
+      { url: "/assets/img/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/assets/img/favicon.ico", sizes: "any" },
+    ],
+    apple: "/assets/img/apple-touch-icon.png",
+    shortcut: "/assets/img/favicon.ico",
+  },
   openGraph: {
     title: "Shrink, Merge, and Ship PDFs Faster | Private PDF Workspace",
     description:
@@ -35,7 +44,7 @@ export const metadata: Metadata = {
     siteName: "PDF Zen Studio",
     images: [
       {
-        url: "https://pdfzen.vercel.app/assets/img/pdf.jpg",
+        url: "/assets/img/og-images.jpg",
         width: 1200,
         height: 630,
         alt: "PDF Zen Studio Preview",
@@ -48,7 +57,7 @@ export const metadata: Metadata = {
     title: "Shrink, Merge, and Ship PDFs Faster | Private PDF Workspace",
     description:
       "Compress and merge PDF files locally with a polished, professional workflow.",
-    images: ["https://pdfzen.vercel.app/assets/img/pdf.jpg"],
+    images: ["/assets/img/og-images.jpg"],
   },
   alternates: {
     canonical: "https://pdfzen.vercel.app",
@@ -67,7 +76,9 @@ export default function RootLayout({
         <meta name="author" content="Aldo Tobing" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="google-site-verification" content="FOi8yHeDmxBlTyve7YP90ShIXTiHAxI3ZWyNjKtUhtw" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/assets/img/favicon.ico" />
+        <link rel="icon" href="/assets/img/favicon-96x96.png" sizes="96x96" type="image/png" />
+        <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

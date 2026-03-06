@@ -424,19 +424,32 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:p-6 shadow-sm"
+            className="relative rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 md:p-6 shadow-sm overflow-hidden"
           >
-            <h1 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
-              Ship Smaller PDFs, Faster
-            </h1>
-            <p className="mt-2 text-sm sm:text-base text-slate-600">
-              A private, all-in-one PDF workspace to optimize, organize, and prepare documents for any workflow.
-            </p>
+            {/* Shadow Watermark Background */}
+            <div
+              className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none"
+              style={{
+                backgroundImage: "url('/assets/img/shadow-bg.png')",
+                backgroundPosition: "right center",
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "contain",
+              }}
+            />
+            
+            <div className="relative z-10">
+              <h1 className="font-[var(--font-display)] text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
+                Ship Smaller PDFs, Faster
+              </h1>
+              <p className="mt-2 text-sm sm:text-base text-slate-600">
+                A private, all-in-one PDF workspace to optimize, organize, and prepare documents for any workflow.
+              </p>
 
-            <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
-              <SummaryCard label="Files" value={String(files.length)} />
-              <SummaryCard label="Total Size" value={formatBytes(totalSize)} />
-              <SummaryCard label="Total Pages" value={String(totalPages)} />
+              <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+                <SummaryCard label="Files" value={String(files.length)} />
+                <SummaryCard label="Total Size" value={formatBytes(totalSize)} />
+                <SummaryCard label="Total Pages" value={String(totalPages)} />
+              </div>
             </div>
           </motion.header>
 
