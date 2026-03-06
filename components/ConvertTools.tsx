@@ -445,6 +445,7 @@ function ImagesToPdf({
                 : "border-slate-600 hover:border-slate-500 hover:bg-slate-700/50"
             }`}
           >
+            <label htmlFor="images-to-pdf-upload" className="sr-only">Upload images to convert to PDF</label>
             <input {...getInputProps({ id: 'images-to-pdf-upload' })} />
             
             {images.length === 0 ? (

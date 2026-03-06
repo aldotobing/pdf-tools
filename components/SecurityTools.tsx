@@ -488,6 +488,7 @@ function WatermarkTool({
                       : "border-slate-600 hover:border-slate-500 hover:bg-slate-700/50"
                   }`}
                 >
+                  <label htmlFor="watermark-image-upload" className="sr-only">Upload watermark image</label>
                   <input {...getInputProps({ id: 'watermark-image-upload' })} />
                   <Upload className="mx-auto text-slate-400 mb-3" size={32} />
                   {isDragActive ? (

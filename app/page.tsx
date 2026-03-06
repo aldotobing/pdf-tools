@@ -527,6 +527,7 @@ export default function HomePage() {
                 isDragActive ? "border-slate-500 bg-slate-100" : "border-slate-300 bg-slate-50"
               }`}
             >
+              <label htmlFor="pdf-upload-input" className="sr-only">Upload PDF files</label>
               <input {...getInputProps({ id: 'pdf-upload-input' })} />
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">

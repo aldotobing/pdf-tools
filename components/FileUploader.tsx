@@ -50,6 +50,7 @@ export default function FileUploader({
             : "border-gray-300 hover:border-blue-400"
         }`}
       >
+        <label htmlFor="pdf-file-uploader" className="sr-only">Upload PDF files</label>
         <input {...getInputProps({ id: 'pdf-file-uploader' })} />
         <div>
           <motion.div
